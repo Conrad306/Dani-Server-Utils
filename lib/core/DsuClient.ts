@@ -79,6 +79,14 @@ export class DsuClient extends Client {
   /** The loader used for slash command interactions. */
   public textCommandLoader: TextCommandLoader;
 
+  public channelMessages: Collection<
+    string,
+    {
+      word: string;
+      count: number;
+    }[]
+  >;
+
   /**
    * A timeout handler for chains.
    */
@@ -118,6 +126,7 @@ export class DsuClient extends Client {
     this.textCommands = new Collection();
     this.textCommandLoader = new TextCommandLoader(this);
 
+    this.channelMessages = new Collection();
     this.dirtyCooldownHandler = new TimeoutHandler();
 
     this._connectMongo();
