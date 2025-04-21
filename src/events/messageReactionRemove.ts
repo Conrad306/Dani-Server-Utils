@@ -2,7 +2,7 @@ import { MessageReaction, User, MessageReactionEventDetails } from "discord.js";
 import { DsuClient } from "lib/core/DsuClient";
 import { EventLoader } from "lib/core/loader";
 
-export default class MessageUpdate extends EventLoader {
+export default class MessageReactionRemove extends EventLoader {
   constructor(client: DsuClient) {
     super(client, "messageReactionRemove");
   }

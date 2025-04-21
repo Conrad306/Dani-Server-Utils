@@ -20,6 +20,7 @@ export default class AsciiName extends ApplicationCommand {
   }
 
   public async run(interaction: UserContextMenuCommandInteraction) {
+    const badNameUtility = this.client.utils.getUtility("badName");
     if (!(interaction.targetMember instanceof GuildMember)) {
       return interaction.reply({
         content: "ASCII name only works on guild members",
@@ -42,7 +43,7 @@ export default class AsciiName extends ApplicationCommand {
         flags: MessageFlags.Ephemeral,
       });
     }
-    interaction.targetMember, name;
+    badNameUtility.setMemberName(interaction.targetMember, name);
     return interaction.reply({
       content: "User renamed successfully",
       flags: MessageFlags.Ephemeral,
