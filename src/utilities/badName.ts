@@ -1,6 +1,7 @@
 import { ClientUtilities } from "lib/core/ClientUtilities";
 import { badNameCombinations, nameSeed } from "../types/constants/names";
 import { DsuClient } from "lib/core/DsuClient";
+import { GuildMember } from "discord.js";
 export class BadNameUtility extends ClientUtilities {
   constructor(client: DsuClient) {
     super(client);
@@ -68,5 +69,22 @@ export class BadNameUtility extends ClientUtilities {
       .map((name) => ({ name, sort: rng() }))
       .sort((a, b) => a.sort - b.sort)
       .map((a) => a.name.trim());
+  }
+
+  public async setMemberName(
+    member: GuildMember,
+    newName: string
+  ): Promise<void> {
+    const oldName = member.nickname ?? member.user.username;
+    await this.client.utils
+      .getUtility("default")
+      .setNameInMemory(member.id, member.guild.id, newName);
+    await member.setNickname(newName).catch(async (e) => {
+      console.error(e);
+      await this.client.utils
+        .getUtility("default")
+        .setNameInMemory(member.id, member.guild.id, oldName);
+      return;
+    });
   }
 }

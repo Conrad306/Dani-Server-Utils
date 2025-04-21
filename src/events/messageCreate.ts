@@ -81,6 +81,9 @@ export default class MessageCreate extends EventLoader {
       autoSlowManager.setOptimalSlowMode(message.channel);
     }
 
+    const emojiUtility = this.client.utils.getUtility("emoji");
+
+    emojiUtility.countEmoji(message);
     if (level == -1) {
       return;
     }

@@ -106,35 +106,41 @@ export default class AutoSlow extends ApplicationCommand {
     const defaultUtility = this.client.utils.getUtility("default");
     if (subCommand === REMOVE) {
       await defaultUtility.removeAutoSlow(interaction.channelId);
-      return {
+      return interaction.reply({
         content: "Autoslow removed successfully",
-        eph: true,
-      };
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     const currentAutoSlow = await defaultUtility.getAutoSlow(
       interaction.channelId
     );
 
-    const commandMin = interaction.options.getInteger(MIN);
-    const commandMax = interaction.options.getInteger(MAX);
-    const commandFreq = interaction.options.getInteger(FREQUENCY);
-    const commandMinChange = interaction.options.getInteger(MAX_CHANGE);
-    const commandRateOfChange = interaction.options.getInteger(RATE_OF_CHANGE);
+    const commandMin = interaction.options.getNumber(MIN);
+    const commandMax = interaction.options.getNumber(MAX);
+    const commandFreq = interaction.options.getNumber(FREQUENCY);
+    const commandMinChange = interaction.options.getNumber(MAX_CHANGE);
+    const commandRateOfChange = interaction.options.getNumber(RATE_OF_CHANGE);
     const commandEnabled = interaction.options.getBoolean(ENABLED);
 
     if (subCommand === GET) {
-      let title = "Autoslow doesn't exist in this channel";
-      let params: APIEmbedField[] = [];
-      if (currentAutoSlow !== null) {
-        title = "Autoslow parameters";
-        params = this.paramEmbed(currentAutoSlow!);
+      if (!currentAutoSlow) {
+        return interaction.reply({
+          embeds: [
+            defaultUtility.generateEmbed("error", {
+              title: "Autoslow does not exist in this channel.",
+            }),
+          ],
+        });
       }
-      const embed = new EmbedBuilder().setTitle(title).addFields(params);
-      return {
+      let params: APIEmbedField[] = [];
+      const embed = defaultUtility
+        .generateEmbed("general", { title: "Autoslow Parameters" })
+        .addFields(params);
+      return interaction.reply({
         embeds: [embed],
-        eph: true,
-      };
+        flags: MessageFlags.Ephemeral,
+      });
     }
 
     const min = commandMin ?? currentAutoSlow?.minSlow;
@@ -241,7 +247,7 @@ export default class AutoSlow extends ApplicationCommand {
 
     const params = this.paramEmbed(autoSlow);
 
-    await interaction.reply({
+    return await interaction.reply({
       embeds: [
         defaultUtility.generateEmbed("success", {
           title: "Slow Mode Setup Successful",
@@ -250,5 +256,7 @@ export default class AutoSlow extends ApplicationCommand {
       ],
       flags: MessageFlags.Ephemeral,
     });
+
+    return;
   }
 }

@@ -29,7 +29,9 @@ export class ButtonLoader extends BaseInteractionLoader {
 
     if (!button) return;
     if (
-      interaction.message.interactionMetadata?.user.id !== interaction.user.id
+      interaction.message.interactionMetadata?.user.id !==
+        interaction.user.id &&
+      !button.global
     ) {
       return interaction.reply({
         content: "You cannot use this button.",

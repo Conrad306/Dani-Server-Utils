@@ -22,16 +22,14 @@ export default class Codeblock extends ApplicationCommand {
     const cdsKey = `Codeblock-${interaction.user.id}`;
     const cooldowns = this.client.applicationCommandLoader.cooldowns;
 
-    // Get or initialize user cooldowns
     if (!cooldowns.has(this.name)) {
       cooldowns.set(this.name, new Collection<string, number>());
     }
 
     const now = Date.now();
     const timestamps = cooldowns.get(this.name)!;
-    const cooldownAmount = 20000; // 20 seconds in ms
+    const cooldownAmount = 20000;
 
-    // Check cooldown
     if (timestamps.has(cdsKey)) {
       const expirationTime = timestamps.get(cdsKey)! + cooldownAmount;
 

@@ -199,3 +199,12 @@ export interface IPhraseMatcher {
   logChannelId: string;
   guildId: string;
 }
+
+interface RawEmojiUsage {
+  guildId: string;
+  name: string;
+  count: number;
+  lastUsage: Date;
+}
+
+export interface IEmojiUsage extends RawEmojiUsage, Document {}

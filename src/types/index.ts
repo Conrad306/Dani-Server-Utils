@@ -16,6 +16,7 @@ import { BadNameUtility } from "../utilities/badName";
 import { LinkHandlerUtility } from "../utilities/linkHandler";
 import { DsuClient } from "lib/core/DsuClient";
 import { ClientUtilities } from "lib/core/ClientUtilities";
+import { EmojiSuggestionsUtility } from "../utilities/emojiSuggestions";
 
 export interface ClientConfig {
   ownerId: string;
@@ -52,6 +53,7 @@ export const utilities = {
   badName: BadNameUtility,
   linkHandler: LinkHandlerUtility,
   timeParser: TimeParserUtility,
+  emoji: EmojiSuggestionsUtility,
 } as const;
 
 export type UtilityKey = keyof typeof utilities;

@@ -27,6 +27,7 @@ import {
   ModalLoader,
 } from "./loader";
 import { TimeoutHandler } from "./TimeoutHandler";
+import { EmojiSuggestions } from "../../src/utilities/emojiSuggestions";
 
 export class DsuClient extends Client {
   /** A more location accurate replacement for __dirname that matches the source correctly. */
@@ -87,6 +88,8 @@ export class DsuClient extends Client {
     }[]
   >;
 
+  public emojiEventCache: Map<string, EmojiSuggestions>;
+
   /**
    * A timeout handler for chains.
    */
@@ -128,6 +131,8 @@ export class DsuClient extends Client {
 
     this.channelMessages = new Collection();
     this.dirtyCooldownHandler = new TimeoutHandler();
+
+    this.emojiEventCache = new Map();
 
     this._connectMongo();
     this._loadEvents();

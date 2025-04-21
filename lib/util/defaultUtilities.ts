@@ -3,9 +3,14 @@ import { readdirSync } from "fs";
 import { resolve } from "path";
 import { ClientUtilities } from "lib/core/ClientUtilities";
 import {
+  ActionRowBuilder,
   APIEmbed,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
   ColorResolvable,
   Colors,
+  CommandInteraction,
   EmbedBuilder,
   GuildMember,
   Message,
@@ -34,7 +39,7 @@ export default class DefaultClientUtilities extends ClientUtilities {
     return files;
   }
 
-  unicode2Ascii(name: string): string {
+  unicodeToAscii(name: string): string {
     const asciiNameNfkd = name
       .normalize("NFKD")
       .replace(/[\u0300-\u036f]/g, "");
@@ -255,5 +260,88 @@ export default class DefaultClientUtilities extends ClientUtilities {
     };
 
     await NameModel.findOne(filter, { name }, { upsert: true });
+  }
+
+  async buildPagination<T>(
+    interaction: CommandInteraction,
+    items: T[],
+    totalPages: number,
+    currentPage: number,
+    itemsPerPage: number,
+    formatPage: (pageItems: T[], index: number) => string
+  ) {
+    const createEmb = (page: number) => {
+      const embed = new EmbedBuilder()
+        .setTitle(`Page ${page + 1} of ${totalPages}`)
+        .setColor("Blurple")
+        .setDescription(
+          formatPage(
+            items.slice(page * itemsPerPage, (page + 1) * itemsPerPage),
+            page
+          ) || "No items to display."
+        );
+      return embed;
+    };
+
+    const createActionRow = () => {
+      return new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("page_back")
+          .setLabel("Previous")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(currentPage === 0),
+        new ButtonBuilder()
+          .setCustomId("page_fwd")
+          .setLabel("Next")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(currentPage === totalPages - 1)
+      );
+    };
+
+    const initalResponse = await interaction.reply({
+      embeds: [createEmb(currentPage)],
+      components: [createActionRow()],
+      withResponse: true,
+    });
+
+    const collector =
+      initalResponse.resource?.message?.createMessageComponentCollector({
+        time: 6000000,
+        filter: (msg) => msg.user.id == interaction.user.id,
+      });
+
+    collector?.on("collect", async (btn: ButtonInteraction) => {
+      if (!btn.isButton()) return;
+
+      if (btn.customId === "page_back" && currentPage > 0) {
+        currentPage--;
+      } else if (btn.customId === "page_fwd" && currentPage < totalPages - 1) {
+        currentPage++;
+      }
+
+      await btn.update({
+        embeds: [createEmb(currentPage)],
+        components: [createActionRow()],
+      });
+    });
+
+    collector?.on("end", async () => {
+      const disabledRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("page_back")
+          .setLabel("Previous")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
+        new ButtonBuilder()
+          .setCustomId("page_fwd")
+          .setLabel("Next")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true)
+      );
+
+      await interaction.editReply({
+        components: [disabledRow],
+      });
+    });
   }
 }
