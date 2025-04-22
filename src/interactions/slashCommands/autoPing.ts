@@ -7,7 +7,7 @@ import {
   GuildChannel,
   PermissionsBitField,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { AutoPingModel } from "models/AutoPing";
 import { PermissionLevels } from "types/commands";
@@ -24,7 +24,7 @@ const ping = "ping";
 
 export const allTag = "all";
 
-export default class AutoPingCommand extends ApplicationCommand {
+export default class AutoPingCommand extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("autoping", client, {
       type: ApplicationCommandType.ChatInput,

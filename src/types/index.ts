@@ -14,9 +14,8 @@ import { AutoPingUtility } from "../utilities/autoPing";
 import { AutoSlowUtility } from "../utilities/autoSlow";
 import { BadNameUtility } from "../utilities/badName";
 import { LinkHandlerUtility } from "../utilities/linkHandler";
-import { DsuClient } from "lib/core/DsuClient";
-import { ClientUtilities } from "lib/core/ClientUtilities";
 import { EmojiSuggestionsUtility } from "../utilities/emojiSuggestions";
+import { SuggestionUtility } from "../utilities/suggestions";
 
 export interface ClientConfig {
   ownerId: string;
@@ -54,6 +53,7 @@ export const utilities = {
   linkHandler: LinkHandlerUtility,
   timeParser: TimeParserUtility,
   emoji: EmojiSuggestionsUtility,
+  suggestions: SuggestionUtility,
 } as const;
 
 export type UtilityKey = keyof typeof utilities;

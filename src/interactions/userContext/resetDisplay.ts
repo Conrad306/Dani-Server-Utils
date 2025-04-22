@@ -1,16 +1,14 @@
 import {
   ApplicationCommandType,
-  CommandInteraction,
   GuildMember,
-  MessageContextMenuCommandInteraction,
   MessageFlags,
   PermissionsBitField,
   UserContextMenuCommandInteraction,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 
-export default class ResetDisplay extends ApplicationCommand {
+export default class ResetDisplay extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("Reset to Display Name", client, {
       type: ApplicationCommandType.User,

@@ -2,15 +2,14 @@ import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
   ChatInputCommandInteraction,
-  CommandInteraction,
   ModalBuilder,
   PermissionsBitField,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { staffAppCustomId, staffAppQuestions } from "lib/util/questions";
 
-export default class StaffApplicationCommand extends ApplicationCommand {
+export default class StaffApplicationCommand extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("staff", client, {
       description: "apply for staff",

@@ -7,14 +7,14 @@ import {
   ForumChannel,
   PermissionsBitField,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import {
   AutoArchiveForumBlacklistModel,
   AutoArchiveForumModel,
 } from "models/AutoArchive";
 
-export default class AutoArchive extends ApplicationCommand {
+export default class AutoArchive extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("autoarchive", client, {
       type: ApplicationCommandType.ChatInput,

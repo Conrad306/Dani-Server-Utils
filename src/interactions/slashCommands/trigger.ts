@@ -6,12 +6,12 @@ import {
   GuildMember,
   MessageFlags,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { SettingsModel } from "models/Settings";
 import { TriggerModel } from "models/Trigger";
 
-export default class TriggerCommand extends ApplicationCommand {
+export default class TriggerCommand extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("trigger", client, {
       description: "Manage the guild's triggers.",

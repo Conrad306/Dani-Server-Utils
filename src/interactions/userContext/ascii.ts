@@ -1,16 +1,14 @@
 import {
   ApplicationCommandType,
-  CommandInteraction,
   GuildMember,
-  MessageContextMenuCommandInteraction,
   MessageFlags,
   PermissionsBitField,
   UserContextMenuCommandInteraction,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 
-export default class AsciiName extends ApplicationCommand {
+export default class AsciiName extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("ASCII Name", client, {
       type: ApplicationCommandType.User,

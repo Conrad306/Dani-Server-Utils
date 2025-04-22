@@ -16,7 +16,7 @@ import { resolve } from "path";
 import { EventLoader } from "./loader/EventLoader";
 import { existsSync, readdirSync } from "fs";
 import { ISettings } from "../../src/types/mongodb";
-import { Button, Modal, SelectMenu, ApplicationCommand } from "./command";
+import { Button, Modal, SelectMenu, CustomApplicationCommand } from "./command";
 import TextCommand from "./command/TextCommand";
 import {
   ButtonLoader,
@@ -69,10 +69,10 @@ export class DsuClient extends Client {
 
   public modalLoader: ModalLoader;
 
-  /** A collection of slash commands loaded by the client */
-  public applicationCommands: Collection<string, ApplicationCommand>;
+  /** A collection of application (slash, user, and message context) commands loaded by the client */
+  public applicationCommands: Collection<string, CustomApplicationCommand>;
 
-  /** The loader used for slash command interactions. */
+  /** The loader used for application command interactions. */
   public applicationCommandLoader: ApplicationCommandLoader;
 
   /** A collection of text commands loaded by the client. */

@@ -6,12 +6,12 @@ import {
   PermissionsBitField,
   TextChannel,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { AnchorModel } from "models/Anchor";
 import { PermissionLevels } from "types/commands";
 
-export default class AnchorCommand extends ApplicationCommand {
+export default class AnchorCommand extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("anchor", client, {
       type: ApplicationCommandType.ChatInput,

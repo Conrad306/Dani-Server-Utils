@@ -10,7 +10,7 @@ import {
 import { DsuClient } from "../DsuClient";
 import { BaseInteractionLoader } from "./BaseInteractionLoader";
 import { InteractionType } from "types/commands";
-import { ApplicationCommand } from "../command";
+import { CustomApplicationCommand } from "../command";
 
 export class ApplicationCommandLoader extends BaseInteractionLoader {
   public cooldowns = new Collection<string, Collection<string, number>>();
@@ -128,7 +128,9 @@ export class ApplicationCommandLoader extends BaseInteractionLoader {
           const module = await import(path.join(dirPath, file));
           const CommandClass = module.default;
           if (!CommandClass) continue;
-          const command: ApplicationCommand = new CommandClass(this.client);
+          const command: CustomApplicationCommand = new CommandClass(
+            this.client
+          );
           if (command.type !== InteractionType.ApplicationCommand) continue;
           if (command.commandType !== expectedType) {
             this.client.logger.warn(
@@ -162,7 +164,7 @@ export class ApplicationCommandLoader extends BaseInteractionLoader {
     this.load();
   }
 
-  public fetchCommand(name: string): ApplicationCommand | undefined {
+  public fetchCommand(name: string): CustomApplicationCommand | undefined {
     return this.client.applicationCommands.get(name);
   }
 
@@ -191,7 +193,10 @@ export class ApplicationCommandLoader extends BaseInteractionLoader {
     this.run(command, interaction);
   }
 
-  private run(command: ApplicationCommand, interaction: CommandInteraction) {
+  private run(
+    command: CustomApplicationCommand,
+    interaction: CommandInteraction
+  ) {
     command.run(interaction).catch((error): Promise<any> => {
       this.client.logger.error(error);
 

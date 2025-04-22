@@ -6,11 +6,11 @@ import {
   EmbedBuilder,
   GuildMember,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { SettingsModel } from "models/Settings";
 
-export default class PollsCommand extends ApplicationCommand {
+export default class PollsCommand extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("polls", client, {
       type: ApplicationCommandType.ChatInput,

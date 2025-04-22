@@ -1,7 +1,7 @@
 import { AutocompleteInteraction } from "discord.js";
 import { DsuClient } from "../DsuClient";
 import { BaseInteractionLoader } from "./BaseInteractionLoader";
-import { ApplicationCommand } from "../command/ApplicationCommand";
+import { CustomApplicationCommand } from "../command/ApplicationCommand";
 
 export class AutoCompleteLoader extends BaseInteractionLoader {
   constructor(client: DsuClient) {
@@ -26,7 +26,7 @@ export class AutoCompleteLoader extends BaseInteractionLoader {
   }
 
   async run(
-    autoComplete: ApplicationCommand,
+    autoComplete: CustomApplicationCommand,
     interaction: AutocompleteInteraction
   ) {
     const focused = interaction.options.getFocused(true);

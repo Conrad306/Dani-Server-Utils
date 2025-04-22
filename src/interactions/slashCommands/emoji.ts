@@ -7,7 +7,7 @@ import {
   MessageFlags,
   PermissionsBitField,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { EmojiSuggestions } from "../../utilities/emojiSuggestions";
 import { EmojiUsageModel } from "models/EmojiUsage";
@@ -43,7 +43,7 @@ function getEmbed(emojiConfig: EmojiSuggestions): EmbedBuilder {
   ]);
 }
 
-export default class EmojiSuggestion extends ApplicationCommand {
+export default class EmojiSuggestion extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super(EMOJI, client, {
       type: ApplicationCommandType.ChatInput,

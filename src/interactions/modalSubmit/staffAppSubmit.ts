@@ -1,4 +1,4 @@
-import { EmbedBuilder, MessageFlags, ModalSubmitInteraction } from "discord.js";
+import { MessageFlags, ModalSubmitInteraction } from "discord.js";
 import { Modal } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { staffAppQuestions, staffAppCustomId } from "lib/util/questions";

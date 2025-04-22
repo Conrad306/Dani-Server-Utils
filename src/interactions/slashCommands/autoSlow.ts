@@ -3,11 +3,10 @@ import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
   ChatInputCommandInteraction,
-  EmbedBuilder,
   MessageFlags,
   PermissionsBitField,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { PermissionLevels } from "types/commands";
 import { AutoSlowUtility } from "../../utilities/autoSlow";
@@ -23,7 +22,7 @@ const CONFIG = "config";
 const GET = "get";
 const REMOVE = "remove";
 
-export default class AutoSlow extends ApplicationCommand {
+export default class AutoSlow extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("autoslow", client, {
       type: ApplicationCommandType.ChatInput,

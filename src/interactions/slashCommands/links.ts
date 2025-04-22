@@ -8,11 +8,11 @@ import {
   MessageFlags,
   PermissionsBitField,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { LinkPermissionModel } from "models/Links";
 
-export default class Links extends ApplicationCommand {
+export default class Links extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("links", client, {
       permissionLevel: "USER",

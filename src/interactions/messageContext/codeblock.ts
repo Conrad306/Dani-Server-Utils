@@ -6,10 +6,10 @@ import {
   MessageContextMenuCommandInteraction,
   MessageFlags,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 
-export default class Codeblock extends ApplicationCommand {
+export default class Codeblock extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("Convert to Codeblock", client, {
       type: ApplicationCommandType.Message,

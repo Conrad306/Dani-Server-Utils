@@ -6,11 +6,11 @@ import {
   CommandInteraction,
   EmbedBuilder,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { PhraseMatcherModel } from "models/PhraseMatcher";
 
-export default class PhraseCommand extends ApplicationCommand {
+export default class PhraseCommand extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("phrase", client, {
       permissionLevel: "USER",

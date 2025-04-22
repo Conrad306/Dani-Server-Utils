@@ -2,10 +2,10 @@ import {
   ApplicationCommandType,
   ChatInputCommandInteraction,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 
-export default class PingCommand extends ApplicationCommand {
+export default class PingCommand extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("ping", client, {
       type: ApplicationCommandType.ChatInput,

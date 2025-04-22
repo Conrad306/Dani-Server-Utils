@@ -10,7 +10,7 @@ import { BaseInteraction } from "./BaseInteraction";
 import { DsuClient } from "../DsuClient";
 import { InteractionCommandOptions, InteractionType } from "types/commands";
 
-export class ApplicationCommand extends BaseInteraction {
+export class CustomApplicationCommand extends BaseInteraction {
   public readonly description: string;
   public readonly commandType: ApplicationCommandType;
   public readonly options: InteractionCommandOptions;

@@ -3,18 +3,15 @@ import {
   ApplicationCommandOptionType,
   ButtonBuilder,
   ButtonStyle,
-  CacheType,
   ChatInputCommandInteraction,
-  CommandInteraction,
   EmbedBuilder,
   MessageActionRowComponentBuilder,
   PermissionsBitField,
   TextChannel,
 } from "discord.js";
 import { ApplicationCommandType, MessageFlags } from "discord-api-types/v10";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
-import { CommandCooldownModel } from "models/CommandCooldown";
 import { EMOJI_APPROVE, EMOJI_BAN, EMOJI_DENY } from "types/constants/emoji";
 
 export const commandId = "emojisuggest";
@@ -28,7 +25,7 @@ function isValidEmojiName(name: string) {
   return /^[a-zA-Z0-9_]+$/.test(name);
 }
 
-export default class EmojiSuggestion extends ApplicationCommand {
+export default class EmojiSuggestion extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("suggest", client, {
       type: ApplicationCommandType.ChatInput,

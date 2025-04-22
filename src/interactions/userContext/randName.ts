@@ -1,17 +1,15 @@
 import {
   ApplicationCommandType,
-  CommandInteraction,
   GuildMember,
-  MessageContextMenuCommandInteraction,
   MessageFlags,
   PermissionsBitField,
   UserContextMenuCommandInteraction,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { CounterModel } from "models/Counter";
 
-export default class RandName extends ApplicationCommand {
+export default class RandName extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("Random Name", client, {
       type: ApplicationCommandType.User,

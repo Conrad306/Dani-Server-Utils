@@ -3,7 +3,7 @@ import {
   MessageContextMenuCommandInteraction,
   MessageFlags,
 } from "discord.js";
-import { ApplicationCommand } from "lib/core/command";
+import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
 import { z } from "zod";
 import axios from "axios";
@@ -43,7 +43,7 @@ async function translate(message: string): Promise<TranslationDataType> {
   return ret;
 }
 
-export default class Codeblock extends ApplicationCommand {
+export default class Codeblock extends CustomApplicationCommand {
   constructor(client: DsuClient) {
     super("Translate Message", client, {
       type: ApplicationCommandType.Message,
