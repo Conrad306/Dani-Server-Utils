@@ -4,7 +4,6 @@ import {
   ChatInputCommandInteraction,
   EmbedBuilder,
   ForumChannel,
-  GuildChannel,
   PermissionsBitField,
 } from "discord.js";
 import { CustomApplicationCommand } from "lib/core/command";
@@ -110,7 +109,6 @@ export default class AutoPingCommand extends CustomApplicationCommand {
   async run(interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guildId;
     const subcommand = interaction.options.getSubcommand();
-    const autoPingUtility = this.client.utils.getUtility("autoPing");
     if (!interaction.guild)
       return interaction.reply({
         embeds: [

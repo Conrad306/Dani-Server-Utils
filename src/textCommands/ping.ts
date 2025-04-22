@@ -9,7 +9,7 @@ export default class PingTextCommand extends TextCommand {
     });
   }
 
-  public async run(message: Message, args: string[]) {
+  public async run(message: Message, _args: string[]) {
     message.reply("Pong");
   }
 }

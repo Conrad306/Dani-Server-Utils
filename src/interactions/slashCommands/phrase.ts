@@ -3,7 +3,6 @@ import {
   ApplicationCommandType,
   ChannelType,
   ChatInputCommandInteraction,
-  CommandInteraction,
   EmbedBuilder,
 } from "discord.js";
 import { CustomApplicationCommand } from "lib/core/command";

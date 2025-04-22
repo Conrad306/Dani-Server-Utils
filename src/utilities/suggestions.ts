@@ -4,7 +4,6 @@ import {
   ChatInputCommandInteraction,
   GuildTextBasedChannel,
   Message,
-  MessageContextMenuCommandInteraction,
   MessageFlags,
   ModalSubmitInteraction,
   TextChannel,
@@ -13,7 +12,6 @@ import {
 import { ClientUtilities } from "lib/core/ClientUtilities";
 import { DsuClient } from "lib/core/DsuClient";
 import { SuggestionConfigModel, SuggestionModel } from "models/Suggestion";
-import { ObjectId } from "mongoose";
 import { ISuggestionConfig } from "types/mongodb";
 
 export class SuggestionUtility extends ClientUtilities {

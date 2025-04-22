@@ -1,8 +1,5 @@
 import {
   ApplicationCommandType,
-  Collection,
-  CommandInteraction,
-  EmbedBuilder,
   MessageContextMenuCommandInteraction,
   MessageFlags,
   ModalBuilder,

@@ -12,8 +12,6 @@ import {
   Colors,
   CommandInteraction,
   EmbedBuilder,
-  GuildMember,
-  Message,
 } from "discord.js";
 import { AutoSlowModel } from "models/AutoSlow";
 import { AutoSlowUtility } from "../../src/utilities/autoSlow";
@@ -24,6 +22,12 @@ export default class DefaultClientUtilities extends ClientUtilities {
     super(client);
   }
 
+  /**
+   * Recursively reads all files from a directory and returns their absolute paths.
+   * @param directory - The directory to scan for files.
+   * @param extension - The file extension
+   * @returns {string[]} An array of absolute paths to the matching files.
+   */
   readFiles(directory: string, extension: string = ""): string[] {
     const files: string[] = [];
     readdirSync(directory, { withFileTypes: true }).forEach((entry) => {
@@ -39,6 +43,11 @@ export default class DefaultClientUtilities extends ClientUtilities {
     return files;
   }
 
+  /**
+   * Converts a unicode name to an ASCII representation
+   * @param name The name to change
+   * @returns string
+   */
   unicodeToAscii(name: string): string {
     const asciiNameNfkd = name
       .normalize("NFKD")
@@ -50,6 +59,11 @@ export default class DefaultClientUtilities extends ClientUtilities {
     return "";
   }
 
+  /**
+   * Removes any unicode representations within the string
+   * @param name The name to change
+   * @returns string
+   */
   eliminateUnicode(name: string): string {
     let finalName = "";
     for (let char = 0; char < name.length; char++) {
@@ -94,7 +108,13 @@ export default class DefaultClientUtilities extends ClientUtilities {
 
     return false;
   }
-
+  /**
+   * A function to match strings, based loosely on Levenshtein distance.
+   * @param message The original message, left side argument
+   * @param phrase The phrase to match it to, right side argument.
+   * @see https://en.wikipedia.org/wiki/Levenshtein_distance
+   * @returns numeric representation of distance between strings.
+   */
   fuzzyMatch(message: string, phrase: string): number {
     const msg = message.toLowerCase();
     const phr = phrase.toLowerCase();
@@ -132,7 +152,12 @@ export default class DefaultClientUtilities extends ClientUtilities {
 
     return Math.max(0, similarity);
   }
-
+  /**
+   * Helper function to check similar string replacements (like 3 -> E)
+   * @param a Left side argument
+   * @param b Right side argument
+   * @returns boolean
+   */
   isSimilar = (a: string, b: string) => {
     const similarPairs = [
       ["rn", "m"],
@@ -153,6 +178,12 @@ export default class DefaultClientUtilities extends ClientUtilities {
     );
   };
 
+  /**
+   * Creates a colored embed
+   * @param type The type of embed to show
+   * @param data The embed content
+   * @returns APIEmbed
+   */
   generateEmbed(
     type: "success" | "warning" | "error" | "general",
     data: APIEmbed
@@ -174,7 +205,17 @@ export default class DefaultClientUtilities extends ClientUtilities {
     }
     return embed;
   }
-
+  /**
+   * Adds autoslow data to given channel and DB.
+   * @param channelId The id of the channel to add autoslow to
+   * @param min The minimum seconds autoslow should use
+   * @param max The maximum seconds autoslow should use
+   * @param targetMsgsPerSec The frequency of messages
+   * @param minChange The lowest change
+   * @param minChangeRate How many times it should change
+   * @param enabled Whether auto slow is enabled
+   * @returns Promise\<AutoslowUtility\>
+   */
   async addAutoSlow(
     channelId: string,
     min: number,
@@ -208,12 +249,21 @@ export default class DefaultClientUtilities extends ClientUtilities {
 
     return autoSlow;
   }
-
+  /**
+   * Remove autoslow data from given channel and DB.
+   * @param channelId the channel the autoslow is in.
+   * @returns Promise\<void\>
+   */
   async removeAutoSlow(channelId: string): Promise<void> {
     this.client.utils.getUtility("autoSlow").cache.delete(channelId);
     await AutoSlowModel.deleteOne({ channelId: channelId });
   }
 
+  /**
+   * Get autoslow data.
+   * @param channelId the channel the autoslow is in.
+   * @returns Promise\<AutoSlowUtility\> | null
+   */
   async getAutoSlow(channelId: string) {
     let autoSlow = this.client.utils
       .getUtility("autoSlow")
@@ -242,6 +292,12 @@ export default class DefaultClientUtilities extends ClientUtilities {
     }
   }
 
+  /**
+   * Retrieve name from DB
+   * @param userId the id of the user.
+   * @param guildId the id of the guild.
+   * @returns Promise\<string\>
+   */
   async getNameFromMemory(userId: string, guildId: string) {
     const response = await NameModel.findOne({
       userId,
@@ -253,6 +309,13 @@ export default class DefaultClientUtilities extends ClientUtilities {
     return response.name;
   }
 
+  /**
+   * Push name to DB
+   * @param userId the id of the user.
+   * @param guildId the id of the guild.
+   * @param name the name to add
+   * @returns Promise\<void\>
+   */
   async setNameInMemory(userId: string, guildId: string, name: string) {
     const filter = {
       userId,
@@ -261,7 +324,16 @@ export default class DefaultClientUtilities extends ClientUtilities {
 
     await NameModel.findOne(filter, { name }, { upsert: true });
   }
-
+  /**
+   * Builds button pagination onto an embed.
+   * @param interaction The interaction to run this with.
+   * @param items Generic type grouping of items to display.
+   * @param totalPages  The max amount of pages to show.
+   * @param currentPage The starting page.
+   * @param itemsPerPage How many items should be displayed per page.
+   * @param formatPage A function to show the page format.
+   * @returns Promise\<void\>
+   */
   async buildPagination<T>(
     interaction: CommandInteraction,
     items: T[],

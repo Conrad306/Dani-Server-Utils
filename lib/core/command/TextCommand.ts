@@ -27,5 +27,6 @@ export default class TextCommand {
     }
   }
 
+  /** The base function to run the command */
   public async run(_message: Message, _args: string[]): Promise<void> {}
 }

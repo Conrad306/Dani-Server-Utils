@@ -2,7 +2,6 @@ import {
   ApplicationCommandOptionType,
   ApplicationCommandType,
   ChatInputCommandInteraction,
-  codeBlock,
   EmbedBuilder,
   MessageFlags,
   PermissionsBitField,

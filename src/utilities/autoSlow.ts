@@ -24,22 +24,18 @@ export class AutoSlowUtility extends ClientUtilities {
     super(client);
   }
 
-  // Getter for the cache that can be accessed through instance
   get cache(): Map<string, AutoSlowUtility> {
     return AutoSlowUtility._cache;
   }
 
-  // Instance method to add to cache
   addToCache(channelId: string): void {
     AutoSlowUtility._cache.set(channelId, this);
   }
 
-  // Instance method to remove from cache
   removeFromCache(channelId: string): void {
     AutoSlowUtility._cache.delete(channelId);
   }
 
-  // Static methods preserved but now delegate to instance
   static add(channelId: string, instance: AutoSlowUtility): void {
     instance.addToCache(channelId);
   }

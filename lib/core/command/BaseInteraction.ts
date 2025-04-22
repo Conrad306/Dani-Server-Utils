@@ -1,4 +1,4 @@
-import { APIEmbed, GuildMember, Message } from "discord.js";
+import { APIEmbed } from "discord.js";
 import {
   BaseInteractionType,
   InteractionGroups,

@@ -2,7 +2,6 @@ import {
   Client,
   ClientOptions,
   Collection,
-  Events,
   GuildMember,
   Message,
 } from "discord.js";
@@ -14,7 +13,7 @@ import { UtilitiesManager } from "lib/util/manager";
 import { pathToFileURL } from "url";
 import { resolve } from "path";
 import { EventLoader } from "./loader/EventLoader";
-import { existsSync, readdirSync } from "fs";
+import { existsSync } from "fs";
 import { ISettings } from "../../src/types/mongodb";
 import { Button, Modal, SelectMenu, CustomApplicationCommand } from "./command";
 import TextCommand from "./command/TextCommand";
@@ -65,8 +64,10 @@ export class DsuClient extends Client {
   /** The loader used for select menu interactions. */
   public selectMenuLoader: SelectMenuLoader;
 
+  /** A collection of modals loaded by client */
   public modals: Collection<string, Modal>;
 
+  /** The loader used for ModalSubmit interactions */
   public modalLoader: ModalLoader;
 
   /** A collection of application (slash, user, and message context) commands loaded by the client */
@@ -80,6 +81,7 @@ export class DsuClient extends Client {
   /** The loader used for slash command interactions. */
   public textCommandLoader: TextCommandLoader;
 
+  /** Chain message storage */
   public channelMessages: Collection<
     string,
     {
@@ -88,6 +90,7 @@ export class DsuClient extends Client {
     }[]
   >;
 
+  /** Temporary storage for emoji caching for emoji suggestions. */
   public emojiEventCache: Map<string, EmojiSuggestions>;
 
   /**
@@ -192,6 +195,12 @@ export class DsuClient extends Client {
         }
       });
   }
+  /**
+   * Returns an integer representing the GuildMembers current permission level.
+   * @param message The message sent within the command
+   * @param member The represented GuildMember
+   * @returns {number}
+   */
   getPermLevel(message?: Message, member?: GuildMember) {
     let permLevel = 0;
     if (!member && !message) return 0;

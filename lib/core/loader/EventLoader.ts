@@ -1,4 +1,3 @@
-import { Client, ClientEvents, Events } from "discord.js";
 import { DsuClient } from "../DsuClient";
 import { AllEvents } from "types/index";
 

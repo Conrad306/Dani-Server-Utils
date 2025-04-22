@@ -43,7 +43,5 @@ export class CustomApplicationCommand extends BaseInteraction {
   public async autoComplete(
     _interaction: AutocompleteInteraction,
     _option: AutocompleteFocusedOption
-  ): Promise<void> {
-    // Optional: override in individual commands
-  }
+  ): Promise<void> {}
 }

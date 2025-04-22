@@ -146,7 +146,7 @@ export default class AutoArchive extends CustomApplicationCommand {
             };
           }
 
-          const config = await AutoArchiveForumBlacklistModel.findOneAndUpdate(
+          await AutoArchiveForumBlacklistModel.findOneAndUpdate(
             { guildId },
             { $addToSet: { threads: threadId } },
             { upsert: true, new: true }

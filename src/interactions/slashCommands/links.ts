@@ -3,7 +3,6 @@ import {
   ApplicationCommandType,
   ChannelType,
   ChatInputCommandInteraction,
-  EmbedBuilder,
   GuildMember,
   MessageFlags,
   PermissionsBitField,
@@ -154,7 +153,6 @@ export default class Links extends CustomApplicationCommand {
       });
     }
 
-    const linkUtility = this.client.utils.getUtility("linkHandler");
     const defaultUtility = this.client.utils.getUtility("default");
     const embed = defaultUtility.generateEmbed("success", {
       title: "Updated Link Permissions",

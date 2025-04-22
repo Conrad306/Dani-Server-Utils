@@ -2,7 +2,6 @@ import { DsuClient } from "lib/core/DsuClient";
 import { ClientUtilities } from "lib/core/ClientUtilities";
 import { Mutex } from "async-mutex";
 import {
-  ButtonInteraction,
   ChannelType,
   EmbedBuilder,
   Message,
@@ -15,12 +14,6 @@ import axios from "axios";
 import { emojiSuffix } from "../interactions/slashCommands/emojiSuggest";
 import { EMOJI_APPROVE, EMOJI_DENY } from "types/constants/emoji";
 import { EmojiUsageModel } from "models/EmojiUsage";
-import { Times } from "types/index";
-
-const confirmationTimeoutPeriod = 15000;
-
-const emojiBan = "emojiBan";
-
 export class SynchronizeById {
   private lock: Mutex;
   private lockMap: Map<string, Mutex>;
@@ -102,7 +95,6 @@ export class EmojiSuggestions {
   }
 }
 const reactionSync = new SynchronizeById();
-const emojiUsageDecayPerDay = 0.9;
 
 export class EmojiSuggestionsUtility extends ClientUtilities {
   constructor(client: DsuClient) {
@@ -345,8 +337,6 @@ export class EmojiSuggestionsUtility extends ClientUtilities {
   }
 
   async addEmoji(guildId: string, name: string): Promise<void> {
-    const millis15min = 15 * 60 * 1000;
-
     const time = Date.now();
 
     const emojiUsage = await EmojiUsageModel.findOneAndUpdate(
