@@ -387,9 +387,15 @@ export default class MessageCreate extends EventLoader {
         ...message.content.matchAll(/discord\.gg\/([a-zA-Z0-9]+)/g),
       ];
 
+      const previousMatches = [];
+
       matches.forEach(async (match) => {
         const code = match[1];
-        console.log(`discord.gg/${code}`);
+        if(previousMatches.includes(code)) { 
+          return; 
+        } else {
+          previousMatches.push(code);
+        }
         try {
           const server = await this.client.fetchInvite(code);
           if (!server.guild) return;
