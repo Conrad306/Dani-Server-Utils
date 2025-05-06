@@ -4,13 +4,14 @@ import {
   ChannelType,
   ChatInputCommandInteraction,
   Collection,
+  GuildMember,
   GuildTextBasedChannel,
   MessageFlags,
 } from "discord.js";
+import { SuggestionConfigModel, SuggestionModel } from "models/Suggestion";
 
 import { CustomApplicationCommand } from "lib/core/command";
 import { DsuClient } from "lib/core/DsuClient";
-import { SuggestionConfigModel } from "models/Suggestion";
 import { Times } from "types/index";
 
 export default class SuggestionsCommand extends CustomApplicationCommand {
@@ -55,14 +56,108 @@ export default class SuggestionsCommand extends CustomApplicationCommand {
             },
           ],
         },
+        {
+          name: "ban",
+          description: "Ban a user from submitting suggestions.",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "user",
+              description: "The user to ban.",
+              type: ApplicationCommandOptionType.User,
+              required: true,
+            },
+          ],
+        },
+        {
+          name: "unban",
+          description: "Unban a user from submitting suggestions.",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "user",
+              description: "The user to unban.",
+              type: ApplicationCommandOptionType.User,
+              required: true,
+            },
+          ],
+        },
+        {
+          name: "author",
+          description: "Find the author of a suggestion via message ID.",
+          type: ApplicationCommandOptionType.Subcommand,
+          options: [
+            {
+              name: "message_id",
+              description: "The suggestion message ID.",
+              type: ApplicationCommandOptionType.String,
+              required: true,
+            },
+          ],
+        },
       ],
     });
   }
 
   async run(interaction: ChatInputCommandInteraction) {
     const subcommand = interaction.options.getSubcommand();
-    if (subcommand === "config") return this.handleConfig(interaction);
-    if (subcommand === "create") return this.handleCreate(interaction);
+
+    const permLevel = this.client.getPermLevel(
+      undefined,
+      interaction.member as GuildMember,
+    );
+    const helperCmds = ["ban", "unban", "author"];
+    if (permLevel < 2 && helperCmds.includes(subcommand)) {
+      return await interaction.reply({
+        embeds: [
+          {
+            title: "Insufficient Permissions",
+            description: "Must be perm level 2 (Helper) to use this command.",
+          },
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    switch (subcommand) {
+      case "config":
+        return this.handleConfig(interaction);
+      case "create":
+        return this.handleCreate(interaction);
+      case "ban":
+        return this.handleBan(interaction);
+      case "unban":
+        return this.handleUnban(interaction);
+      case "author":
+        return this.handleGetAuthor(interaction);
+    }
+  }
+
+  private async handleGetAuthor(interaction: ChatInputCommandInteraction) {
+    const messageId = interaction.options.getString("message_id", true);
+    const suggestion = await SuggestionModel.findOne({ messageId });
+
+    if (!suggestion) {
+      return interaction.reply({
+        embeds: [
+          this.client.utils.getUtility("default").generateEmbed("error", {
+            title: "Not Found",
+            description: `No suggestion found with message ID \`${messageId}\`.`,
+          }),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    return interaction.reply({
+      embeds: [
+        this.client.utils.getUtility("default").generateEmbed("general", {
+          title: "Suggestion Author",
+          description: `User ID: \`${suggestion.userId}\``,
+        }),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
   }
 
   private parseCooldown(input: string): number | null {
@@ -155,6 +250,20 @@ export default class SuggestionsCommand extends CustomApplicationCommand {
       });
     }
 
+    const isBanned = config.bannedUsers.find((v) => v.userId === interaction.user.id);
+
+    if (isBanned) {
+      return interaction.reply({
+        embeds: [
+          defaultUtility.generateEmbed("error", {
+            title: "Banned",
+            description: `You are banned from submitting suggestions in this server.\nReason: \`${isBanned.reason ?? "No reason specified"}\``,
+          }),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
     if (!cooldowns.has(commandName)) {
       cooldowns.set(commandName, new Collection());
     }
@@ -178,19 +287,96 @@ export default class SuggestionsCommand extends CustomApplicationCommand {
       });
     }
 
+    await interaction.deferReply({ flags: "Ephemeral" });
+
     timestamps.set(interaction.user.id, now + cooldownAmount);
 
     await suggestionUtility.sendAnonymousSuggestion(interaction, content, config);
 
-    interaction.reply({
+    interaction.editReply({
       embeds: [
         defaultUtility.generateEmbed("success", {
           title: "Suggestion sent!",
           description: `View your suggestion in <#${config.channelId}>!`,
         }),
       ],
-      flags: MessageFlags.Ephemeral,
     });
     return;
+  }
+
+  private async handleBan(interaction: ChatInputCommandInteraction) {
+    const defaultUtility = this.client.utils.getUtility("default");
+    const user = interaction.options.getUser("user", true);
+    const reason = interaction.options.getString("reason") ?? "No reason specified";
+
+    const config = await SuggestionConfigModel.findOne({
+      guildId: interaction.guildId,
+      "bannedUsers.userId": user.id,
+    });
+
+    if (config) {
+      return interaction.reply({
+        embeds: [
+          defaultUtility.generateEmbed("error", {
+            title: "Already Banned",
+            description: `${user.tag} is already banned from submitting suggestions.\nReason: \`${config.bannedUsers.find((u) => u.userId === user.id)?.reason ?? "No reason specified"}\``,
+          }),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    await SuggestionConfigModel.updateOne(
+      { guildId: interaction.guildId },
+      { $addToSet: { bannedUsers: { userId: user.id, reason } } },
+      { upsert: true },
+    );
+
+    return interaction.reply({
+      embeds: [
+        defaultUtility.generateEmbed("success", {
+          title: "User Banned",
+          description: `${user.tag} has been banned from submitting suggestions.\nReason: \`${reason}\``,
+        }),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
+  }
+
+  private async handleUnban(interaction: ChatInputCommandInteraction) {
+    const defaultUtility = this.client.utils.getUtility("default");
+    const user = interaction.options.getUser("user", true);
+
+    const config = await SuggestionConfigModel.findOne({
+      guildId: interaction.guildId,
+      "bannedUsers.userId": user.id,
+    });
+
+    if (!config) {
+      return interaction.reply({
+        embeds: [
+          defaultUtility.generateEmbed("error", {
+            title: "Not Banned",
+            description: `${user.tag} is not currently banned from submitting suggestions.`,
+          }),
+        ],
+        flags: MessageFlags.Ephemeral,
+      });
+    }
+
+    await SuggestionConfigModel.updateOne(
+      { guildId: interaction.guildId },
+      { $pull: { bannedUsers: { userId: user.id } } },
+    );
+
+    return interaction.reply({
+      embeds: [
+        defaultUtility.generateEmbed("success", {
+          title: "User Unbanned",
+          description: `${user.tag} has been unbanned from submitting suggestions.`,
+        }),
+      ],
+      flags: MessageFlags.Ephemeral,
+    });
   }
 }

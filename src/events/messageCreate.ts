@@ -4,11 +4,15 @@ import {
   ButtonStyle,
   ChannelType,
   ColorResolvable,
+  ContainerBuilder,
   EmbedBuilder,
   GuildChannel,
-  GuildNSFWLevel,
+  MediaGalleryBuilder,
   Message,
+  MessageFlags,
+  MessageType,
   TextChannel,
+  TextDisplayBuilder,
 } from "discord.js";
 
 import { DsuClient } from "lib/core/DsuClient";
@@ -30,6 +34,50 @@ export default class MessageCreate extends EventLoader {
   }
 
   override async run(message: Message) {
+    if (message.type == MessageType.AutoModerationAction) {
+      let content = message.embeds[0].description;
+      if (!content) {
+        return this.client.logger.error(
+          "Internal error: data does not exist inside automod message;",
+        );
+      }
+      if (content.match(/discord\.gg\/([a-zA-Z0-9]+)/g)) {
+        const matches = [...content.matchAll(/discord\.gg\/([a-zA-Z0-9]+)/g)];
+
+        matches.forEach(async (match) => {
+          const code = match[1];
+          try {
+            const server = await this.client.fetchInvite(code);
+            if (!server.guild) return;
+
+            const container = new ContainerBuilder()
+              .addTextDisplayComponents(
+                new TextDisplayBuilder({
+                  content: `# Resolved Guild\n Name: ${server.guild.name}\n Server Avatar:`,
+                }),
+              )
+              .addMediaGalleryComponents(
+                new MediaGalleryBuilder().addItems({
+                  media: {
+                    url: `${server.guild?.iconURL() || "https://cdn.discordapp.com/embed/avatars/0.png"}`,
+                  },
+                  spoiler: true,
+                }),
+              );
+            await message.reply({
+              flags: MessageFlags.IsComponentsV2,
+              components: [container],
+            });
+          } catch (_) {
+            const embed = this.client.utils.getUtility("default").generateEmbed("error", {
+              title: "Failed to resolve guild",
+              description: `Guild may be banned, deleted, or the invite expired.`,
+            });
+            message.reply({ embeds: [embed] });
+          }
+        });
+      }
+    }
     if (message.author.bot) return;
     if (!message.guild) return;
     if (
@@ -75,14 +123,14 @@ export default class MessageCreate extends EventLoader {
 
     const emojiUtility = this.client.utils.getUtility("emoji");
 
-    emojiUtility.countEmoji(message);
+    await emojiUtility.countEmoji(message);
     if (level == -1) {
       return;
     }
     const linkUtility = this.client.utils.getUtility("linkHandler");
     const hasLink = linkUtility.parseMessageForLink(message.content);
 
-    const canSendLinks = linkUtility.checkLinkPermissions(
+    const canSendLinks = await linkUtility.checkLinkPermissions(
       message.guildId ?? "",
       message.channelId,
       message.author.id,
@@ -286,26 +334,38 @@ export default class MessageCreate extends EventLoader {
         userId: message.author.id,
         triggerId: id,
       });
-
       if (optedOut) {
         continue;
       }
-      if (this.client.dirtyCooldownHandler.has(id)) {
+
+      if (!this.client.dirtyCooldownHandler.has(id)) {
         const matched: string[] = [];
         const allMatch =
-          trigger.keywords.length != 0 &&
+          trigger.keywords.length !== 0 &&
           trigger.keywords.every((keywordArr) =>
             keywordArr
               .map((v) => new RegExp(v.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1"), "i"))
-              .some(
-                (k) =>
-                  message.content.match(k) &&
-                  matched.push(k.source) &&
-                  // Ignore trigger content if matched trigger is a custom emoji's name.
-                  message.content.match(/<a?:.+?:\d+>/)?.length == 0,
-              ),
-          );
+              .some((regex) => {
+                const match = message.content.match(regex);
+                if (match) {
+                  const matchedStr = match[0];
 
+                  // Skip if the matched string is part of a custom emoji name
+                  const isInCustomEmoji = Array.from(
+                    message.content.matchAll(/<a?:([a-zA-Z0-9_]+):\d+>/g),
+                  ).some(
+                    ([, emojiName]) =>
+                      emojiName.toLowerCase() === matchedStr.toLowerCase(),
+                  );
+
+                  if (!isInCustomEmoji) {
+                    matched.push(regex.source);
+                    return true;
+                  }
+                }
+                return false;
+              }),
+          );
         if (allMatch) {
           const button = new ActionRowBuilder<ButtonBuilder>().setComponents(
             new ButtonBuilder()
@@ -358,39 +418,6 @@ export default class MessageCreate extends EventLoader {
       }
     }
 
-    // auto-resolve discord urls
-    if (message.content.match(/discord\.gg\/([a-zA-Z0-9]+)/g)) {
-      const matches = [...message.content.matchAll(/discord\.gg\/([a-zA-Z0-9]+)/g)];
-
-      matches.forEach(async (match) => {
-        const code = match[1];
-        console.log(`discord.gg/${code}`);
-        try {
-          const server = await this.client.fetchInvite(code);
-          if (!server.guild) return;
-
-          const embed = this.client.utils.getUtility("default").generateEmbed("success", {
-            title: "Resolved guild",
-            description: `Name: ${server.guild.name}`,
-            fields: [
-              {
-                name: "NSFW Level",
-                value: `${GuildNSFWLevel[server.guild.nsfwLevel]}`,
-              },
-            ],
-          });
-          await message.reply({ embeds: [embed] }).then((msg) => {
-            msg.reply(`Server avatar: ||${server.guild?.iconURL()}||`);
-          });
-        } catch (_) {
-          const embed = this.client.utils.getUtility("default").generateEmbed("error", {
-            title: "Failed to resolve guild",
-            description: `Guild may be banned, deleted, or the invite expired.`,
-          });
-          message.reply({ embeds: [embed] });
-        }
-      });
-    }
     this.client.textCommandLoader.handle(message);
   }
 }

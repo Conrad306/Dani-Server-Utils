@@ -80,17 +80,14 @@ export class SuggestionUtility extends ClientUtilities {
       suggestionConfig.deniedThreadId!,
     )) as ThreadChannel;
 
-    // Lock suggestion discussion thread
     await originalMessage.thread?.setLocked(true);
 
-    // Remove reactions, forward message, and edit the original embed to notify users.
     await originalMessage.reactions.removeAll();
     await originalMessage.edit({
-      embeds: [this.generateDenialEmbed(suggestion.content, thread.id)],
+      embeds: [this.generateDenialEmbed(suggestion.content, reason)],
     });
 
     await originalMessage.forward(thread.id);
-    await thread.send(`The above submission has been denied!\nReason: ${reason}`);
 
     suggestionConfig.existingSubmissions = suggestionConfig.existingSubmissions.filter(
       (id) => !id.equals(suggestion._id as string),
@@ -200,13 +197,13 @@ export class SuggestionUtility extends ClientUtilities {
     return {
       title: "New Suggestion",
       color: this.client.config.colors.success,
-      description: `Suggestion: \n ${content}`,
+      description: `${content}`,
     } as APIEmbed;
   }
 
-  generateDenialEmbed(content: string, denialThreadId: string) {
+  generateDenialEmbed(content: string, reason?: string) {
     return {
-      title: `This submission has been denied! View reason in <#${denialThreadId}>`,
+      title: `Submission Denied! The reason is: \`${reason ?? "No reason specified"}\``,
       color: this.client.config.colors.error,
       description: `Suggestion: \n ${content}`,
     } as APIEmbed;
