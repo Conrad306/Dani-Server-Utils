@@ -4,7 +4,6 @@ import {
   ApplicationCommandType,
   ChannelType,
   ChatInputCommandInteraction,
-  EmbedBuilder,
   GuildMember,
   MessageFlags,
   PermissionsBitField,
